@@ -22,10 +22,15 @@ export default function About() {
             transition={{ duration: 0.6 }}
             className="flex justify-center"
           >
-            <div className="relative w-64 h-80 md:w-80 md:h-[420px] rounded-2xl bg-muted border border-border overflow-hidden shadow-glow">
-              <div className="absolute inset-0 flex items-center justify-center text-6xl text-muted-foreground/30 font-display font-bold">
-                M.Y.
-              </div>
+            <div className="relative w-64 h-80 md:w-80 md:h-[420px] rounded-2xl border border-border overflow-hidden shadow-glow">
+              <img
+                src="/placeholder-profile.jpg"
+                alt="Михаил — израильский эксперт по веб-технологиям"
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+              {/* Gradient overlay at bottom */}
+              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/90 to-transparent" />
             </div>
           </motion.div>
 

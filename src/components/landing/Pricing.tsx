@@ -6,7 +6,9 @@ const plans = [
   {
     icon: "⚡",
     name: "СТАРТ",
+    oldPrice: "$800",
     price: "от $500",
+    saving: "$300",
     popular: false,
     features: [
       { text: "Лендинг до 5 экранов", included: true },
@@ -23,7 +25,9 @@ const plans = [
   {
     icon: "🚀",
     name: "БИЗНЕС",
+    oldPrice: "$2,500",
     price: "от $1,500",
+    saving: "$1,000",
     popular: true,
     features: [
       { text: "Многостраничный сайт", included: true },
@@ -40,7 +44,9 @@ const plans = [
   {
     icon: "💎",
     name: "ПРЕМИУМ",
+    oldPrice: "$5,000",
     price: "от $3,000",
+    saving: "$2,000",
     popular: false,
     features: [
       { text: "Полная экосистема", included: true },
@@ -94,7 +100,13 @@ export default function Pricing() {
               <div className="text-center mb-6">
                 <div className="text-2xl mb-2">{p.icon}</div>
                 <h3 className="font-display text-lg font-bold text-foreground">{p.name}</h3>
-                <div className="font-display text-2xl font-extrabold text-primary mt-2">{p.price}</div>
+                <div className="mt-2">
+                  <span className="text-muted-foreground/60 line-through text-sm">{p.oldPrice}</span>
+                  <div className="font-display text-2xl font-extrabold text-primary">{p.price}</div>
+                </div>
+                <span className="inline-block mt-1 bg-success/15 text-success text-xs font-semibold px-2 py-0.5 rounded-full">
+                  Экономия {p.saving}
+                </span>
               </div>
 
               <div className="space-y-3 flex-1 mb-6">
@@ -126,6 +138,7 @@ export default function Pricing() {
                     ? "bg-gradient-primary text-primary-foreground btn-shimmer"
                     : "border border-border text-foreground hover:border-primary"
                 }`}
+                aria-label={`Выбрать тариф ${p.name}`}
               >
                 Выбрать →
               </a>

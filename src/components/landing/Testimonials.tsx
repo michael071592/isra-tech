@@ -8,18 +8,21 @@ const testimonials = [
     name: "Алексей К.",
     role: "основатель интернет-магазина, Москва",
     tg: "@aleksey_k",
+    avatar: "https://ui-avatars.com/api/?name=%D0%90%D0%BB%D0%B5%D0%BA%D1%81%D0%B5%D0%B9+%D0%9A&background=00D4FF&color=0D1117&size=48&bold=true",
   },
   {
     text: "Telegram-бот, который сделал Михаил, заменил одного сотрудника. Экономим 80,000₽/месяц на зарплате. Окупился за 2 недели. Это магия.",
     name: "Ольга Д.",
     role: "владелица сети салонов, Екатеринбург",
     tg: "@olga_beauty",
+    avatar: "https://ui-avatars.com/api/?name=%D0%9E%D0%BB%D1%8C%D0%B3%D0%B0+%D0%94&background=7B2FFF&color=FFFFFF&size=48&bold=true",
   },
   {
     text: "Профессионализм на уровне, которого я не встречал на российском рынке. Чувствуется израильская школа. Работает быстро, объясняет понятно, результат — ВАУ.",
     name: "Дмитрий С.",
     role: "CEO стартапа, Казань",
     tg: "@dmitriy_startup",
+    avatar: "https://ui-avatars.com/api/?name=%D0%94%D0%BC%D0%B8%D1%82%D1%80%D0%B8%D0%B9+%D0%A1&background=FFD700&color=0D1117&size=48&bold=true",
   },
 ];
 
@@ -27,7 +30,7 @@ export default function Testimonials() {
   const { ref, isVisible } = useScrollAnimation();
 
   return (
-    <section className="py-20 md:py-28" ref={ref}>
+    <section id="testimonials" className="py-20 md:py-28" ref={ref}>
       <div className="container mx-auto px-4">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -54,10 +57,20 @@ export default function Testimonials() {
               <blockquote className="text-muted-foreground text-sm leading-relaxed mb-6 flex-1">
                 «{t.text}»
               </blockquote>
-              <div>
-                <div className="font-display font-semibold text-foreground text-sm">{t.name}</div>
-                <div className="text-muted-foreground text-xs">{t.role}</div>
-                <div className="text-primary text-xs mt-1">💬 {t.tg} (Telegram)</div>
+              <div className="flex items-center gap-3">
+                <img
+                  src={t.avatar}
+                  alt={`Аватар ${t.name}`}
+                  width={48}
+                  height={48}
+                  className="w-12 h-12 rounded-full shrink-0"
+                  loading="lazy"
+                />
+                <div>
+                  <div className="font-display font-semibold text-foreground text-sm">{t.name}</div>
+                  <div className="text-muted-foreground text-xs">{t.role}</div>
+                  <div className="text-primary text-xs mt-0.5">💬 {t.tg} (Telegram)</div>
+                </div>
               </div>
             </motion.div>
           ))}

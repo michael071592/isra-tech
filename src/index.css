@@ -147,6 +147,10 @@
     66% { transform: translate(20px, -10px) scale(1.1); }
   }
 
+  .will-change-transform {
+    will-change: transform;
+  }
+
   .animate-float {
     animation: float 3s ease-in-out infinite;
   }

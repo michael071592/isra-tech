@@ -1,6 +1,13 @@
 import { motion } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
+const borderColors = [
+  "border-l-primary",
+  "border-l-secondary",
+  "border-l-accent",
+  "border-l-success",
+];
+
 const services = [
   {
     icon: "🌐",
@@ -53,8 +60,15 @@ export default function Services() {
               initial={{ opacity: 0, y: 30 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="glass-card p-6 md:p-8 flex flex-col"
+              className={`glass-card p-6 md:p-8 flex flex-col border-l-4 ${borderColors[i]} hover:rotate-[0.5deg] transition-transform duration-300 relative`}
             >
+              {/* Numbered badge */}
+              <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-muted border border-border flex items-center justify-center">
+                <span className="text-xs font-bold text-muted-foreground font-display">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+              </div>
+
               <div className="text-3xl mb-3">{s.icon}</div>
               <h3 className="font-display text-xl font-bold text-foreground mb-3">{s.title}</h3>
               <p className="text-muted-foreground text-sm leading-relaxed mb-5">{s.desc}</p>
@@ -70,6 +84,7 @@ export default function Services() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary text-sm font-semibold hover:underline"
+                aria-label={`${s.cta} — написать в Telegram`}
               >
                 {s.cta}
               </a>

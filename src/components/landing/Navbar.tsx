@@ -5,7 +5,10 @@ const links = [
   { href: "#services", label: "Услуги" },
   { href: "#about", label: "Обо мне" },
   { href: "#portfolio", label: "Портфолио" },
+  { href: "#process", label: "Процесс" },
+  { href: "#testimonials", label: "Отзывы" },
   { href: "#pricing", label: "Цены" },
+  { href: "#faq", label: "FAQ" },
   { href: "#contact", label: "Контакты" },
 ];
 
@@ -28,7 +31,7 @@ export default function Navbar() {
       }`}
     >
       <div className="container mx-auto flex items-center justify-between h-16 md:h-20 px-4">
-        <a href="#" className="font-display text-xl font-800 text-primary tracking-tight">
+        <a href="#" className="font-display text-xl font-800 text-primary tracking-tight" aria-label="На главную">
           M.Y. <span className="text-foreground">|</span> <span className="text-sm text-muted-foreground">Israel 🇮🇱</span>
         </a>
 
@@ -47,6 +50,7 @@ export default function Navbar() {
             target="_blank"
             rel="noopener noreferrer"
             className="bg-gradient-primary text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-semibold btn-shimmer hover:scale-105 transition-transform"
+            aria-label="Бесплатная консультация в Telegram"
           >
             Бесплатная консультация
           </a>
@@ -55,7 +59,7 @@ export default function Navbar() {
         <button
           onClick={() => setOpen(!open)}
           className="md:hidden text-foreground p-2"
-          aria-label="Меню"
+          aria-label="Открыть меню навигации"
         >
           {open ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -79,6 +83,7 @@ export default function Navbar() {
               target="_blank"
               rel="noopener noreferrer"
               className="bg-gradient-primary text-primary-foreground px-5 py-3 rounded-lg text-sm font-semibold text-center"
+              aria-label="Бесплатная консультация в Telegram"
             >
               Бесплатная консультация
             </a>
