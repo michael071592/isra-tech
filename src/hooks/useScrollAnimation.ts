@@ -23,16 +23,15 @@ export function useScrollAnimation(threshold = 0.2) {
   return { ref, isVisible };
 }
 
-export function useCountUp(end: number, duration = 2000, isVisible: boolean) {
+export function useCountUp(end: number, duration = 2500, isVisible: boolean) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     if (!isVisible) return;
-    let start = 0;
     const startTime = performance.now();
     const step = (now: number) => {
       const progress = Math.min((now - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
+      const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
       setCount(Math.floor(eased * end));
       if (progress < 1) requestAnimationFrame(step);
     };

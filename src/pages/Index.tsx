@@ -11,10 +11,14 @@ import FAQ from "@/components/landing/FAQ";
 import FinalCTA from "@/components/landing/FinalCTA";
 import Footer from "@/components/landing/Footer";
 import FloatingElements from "@/components/landing/FloatingElements";
+import ExitPopup from "@/components/landing/ExitPopup";
 
 export default function Index() {
   return (
     <>
+      <a href="#services" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2">
+        Перейти к содержимому
+      </a>
       <Navbar />
       <Hero />
       <Problems />
@@ -28,6 +32,7 @@ export default function Index() {
       <FinalCTA />
       <Footer />
       <FloatingElements />
+      <ExitPopup />
     </>
   );
 }
