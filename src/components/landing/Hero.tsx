@@ -114,7 +114,7 @@ export default function Hero() {
       {!reducedMotion && (
         <div
           className="absolute inset-0 overflow-hidden pointer-events-none select-none"
-          style={{ opacity: 0.5 }}
+          style={{ opacity: 0.25 }}
           aria-hidden="true"
         >
           {CODE_LINES.map((line, i) => (
@@ -251,9 +251,8 @@ export default function Hero() {
               <span
                 key={i}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors flex-shrink-0 cursor-default"
-                style={{ opacity: 0.5 }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "0.5"; }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = "0.7"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
               >
                 {item}
               </span>
