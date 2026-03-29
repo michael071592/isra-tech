@@ -5,6 +5,7 @@ import Problems from "@/components/landing/Problems";
 import Services from "@/components/landing/Services";
 import About from "@/components/landing/About";
 import Portfolio from "@/components/landing/Portfolio";
+import PortfolioGallery from "@/components/landing/PortfolioGallery";
 import Process from "@/components/landing/Process";
 import Testimonials from "@/components/landing/Testimonials";
 import Pricing from "@/components/landing/Pricing";
@@ -33,6 +34,7 @@ export default function Index() {
       <Services />
       <About />
       <Portfolio />
+      <PortfolioGallery />
       <Process />
       <Testimonials />
       <Pricing />
