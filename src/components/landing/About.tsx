@@ -24,7 +24,7 @@ export default function About() {
           >
             <div className="relative w-64 h-80 md:w-80 md:h-[420px] rounded-2xl border border-border overflow-hidden shadow-glow">
               <img
-                src="/placeholder-profile.jpg"
+                src="/profile.jpg"
                 alt="Михаил — израильский эксперт по веб-технологиям"
                 className="w-full h-full object-cover"
                 loading="lazy"
