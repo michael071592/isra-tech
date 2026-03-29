@@ -43,12 +43,12 @@ export default function FloatingElements() {
         />
       </div>
 
-      {/* Floating Telegram button */}
+      {/* Floating Telegram button — moved left to make room for AI chatbot */}
       <a
         href="https://t.me/Isra_Tech"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-primary rounded-full flex items-center justify-center shadow-glow-strong animate-pulse-glow hover:scale-110 transition-transform hidden md:flex"
+        className="fixed bottom-6 right-24 z-50 w-14 h-14 bg-gradient-primary rounded-full flex items-center justify-center shadow-glow-strong animate-pulse-glow hover:scale-110 transition-transform hidden md:flex"
         aria-label="Написать в Telegram"
       >
         <Send size={22} className="text-primary-foreground" />

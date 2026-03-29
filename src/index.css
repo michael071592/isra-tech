@@ -120,6 +120,19 @@
     animation: shimmer 3s infinite;
   }
 
+  /* Gradient hover on section headings */
+  .hover-gradient-text {
+    transition: background 0.3s ease, -webkit-text-fill-color 0.3s ease;
+  }
+  .hover-gradient-text:hover {
+    background: linear-gradient(135deg, hsl(191 100% 50%) 0%, hsl(261 100% 59%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Animations ── */
+
   @keyframes shimmer {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
@@ -147,6 +160,75 @@
     66% { transform: translate(20px, -10px) scale(1.1); }
   }
 
+  /* Matrix code scroll */
+  @keyframes codeScroll {
+    0% { transform: translateY(-60px); opacity: 0; }
+    5% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(110vh); opacity: 0; }
+  }
+
+  /* Tech ticker */
+  @keyframes techTicker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Typing cursor blink */
+  @keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Robot breathing */
+  @keyframes robotBreathe {
+    0%, 100% { transform: scale(1.0); }
+    50% { transform: scale(1.05); }
+  }
+
+  /* Eye blink */
+  @keyframes eyeBlink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.1); }
+  }
+
+  /* Chat bubble appear */
+  @keyframes chatBubbleIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Chat panel open */
+  @keyframes chatOpen {
+    from { opacity: 0; transform: scale(0.9) translateY(10px); transform-origin: bottom right; }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* Message slide in */
+  @keyframes msgSlideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Typing dots wave */
+  @keyframes typingDot {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-4px); opacity: 1; }
+  }
+
+  /* Page loader */
+  @keyframes loaderPulse {
+    0%, 100% { opacity: 1; filter: drop-shadow(0 0 8px hsla(191,100%,50%,0.6)); }
+    50% { opacity: 0.7; filter: drop-shadow(0 0 20px hsla(191,100%,50%,1)); }
+  }
+
+  @keyframes loaderBar {
+    0% { width: 0%; }
+    30% { width: 40%; }
+    70% { width: 75%; }
+    100% { width: 100%; }
+  }
+
   .will-change-transform {
     will-change: transform;
   }
@@ -157,5 +239,15 @@
 
   .animate-pulse-glow {
     animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-float,
+    .animate-pulse-glow,
+    .btn-shimmer::after,
+    [style*="animation"] {
+      animation: none !important;
+    }
   }
 }

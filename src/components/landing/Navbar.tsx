@@ -12,14 +12,39 @@ const links = [
   { href: "#contact", label: "Контакты" },
 ];
 
+const SECTION_IDS = links.map((l) => l.href.slice(1));
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
+  }, []);
+
+  // Active section tracking via IntersectionObserver
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+    const sectionMap = new Map<Element, string>();
+
+    SECTION_IDS.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) setActiveSection(id);
+        },
+        { threshold: 0.3, rootMargin: "-80px 0px -40% 0px" }
+      );
+      obs.observe(el);
+      sectionMap.set(el, id);
+      observers.push(obs);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
   }, []);
 
   return (
@@ -36,15 +61,27 @@ export default function Navbar() {
         </a>
 
         <div className="hidden md:flex items-center gap-8">
-          {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
-            >
-              {l.label}
-            </a>
-          ))}
+          {links.map((l) => {
+            const sectionId = l.href.slice(1);
+            const isActive = activeSection === sectionId;
+            return (
+              <a
+                key={l.href}
+                href={l.href}
+                className="relative text-sm transition-colors duration-200 pb-1"
+                style={{ color: isActive ? "hsl(191 100% 50%)" : undefined }}
+              >
+                <span className={isActive ? "text-primary" : "text-muted-foreground hover:text-primary"}>
+                  {l.label}
+                </span>
+                {/* Active dot indicator */}
+                <span
+                  className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary transition-all duration-300"
+                  style={{ opacity: isActive ? 1 : 0, transform: isActive ? "translateX(-50%) scale(1)" : "translateX(-50%) scale(0)" }}
+                />
+              </a>
+            );
+          })}
           <a
             href="https://t.me/Isra_Tech"
             target="_blank"
