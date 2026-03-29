@@ -77,7 +77,7 @@ function getConfig(offset: number) {
   return CARD_CONFIG[clampedOffset] ?? null;
 }
 
-const SPRING = { type: "spring" as const, stiffness: 260, damping: 28, mass: 1 };
+const SPRING = { type: "spring" as const, stiffness: 220, damping: 32, mass: 0.8 };
 
 // ── Card component ────────────────────────────────────────────────────────
 interface CardProps {
@@ -108,6 +108,7 @@ function CoverCard({ img, offset, onClick, onOpenLightbox }: CardProps) {
         zIndex: cfg.zIndex,
         willChange: "transform, opacity",
       }}
+      initial={false}
       animate={{
         scale: cfg.scale,
         opacity: cfg.opacity,
@@ -290,12 +291,12 @@ export default function PortfolioGallery() {
               }}
             />
 
-            {/* Cards: render -2 to +2 from current */}
+            {/* Cards: stable key = image index so Framer Motion animates between positions */}
             {[-2, -1, 0, 1, 2].map((offset) => {
               const idx = (current + offset + IMAGES.length) % IMAGES.length;
               return (
                 <CoverCard
-                  key={`${current}-${offset}`}
+                  key={idx}
                   img={IMAGES[idx]}
                   offset={offset}
                   onClick={() => offset < 0 ? prev() : next()}
