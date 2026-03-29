@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { ChevronLeft, ChevronRight, X, Maximize2 } from "lucide-react";
 
-const IMAGES = Array.from({ length: 39 }, (_, i) => ({
+const ALL_IMAGES = Array.from({ length: 39 }, (_, i) => ({
   id: i + 1,
   src: `/portfolio/project-${String(i + 1).padStart(2, "0")}.jpg`,
   alt: `Проект ${i + 1}`,
 }));
+
+const BATCH = 12;
 
 // ── Transform config by card offset from center ──────────────────────────
 const CARD_CONFIG: Record<number, {
@@ -79,9 +81,37 @@ function getConfig(offset: number) {
 
 const SPRING = { type: "spring" as const, stiffness: 220, damping: 32, mass: 0.8 };
 
+// ── Blur-loading image ────────────────────────────────────────────────────
+function BlurImage({ src, alt, grayscale, brightness }: {
+  src: string; alt: string; grayscale: number; brightness: number;
+}) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div className="relative w-full h-full">
+      {!loaded && (
+        <div className="absolute inset-0 bg-muted animate-pulse rounded-2xl" />
+      )}
+      <img
+        src={src}
+        alt={alt}
+        draggable={false}
+        loading="lazy"
+        onLoad={() => setLoaded(true)}
+        className="w-full h-full object-cover"
+        style={{
+          filter: `grayscale(${grayscale}) brightness(${brightness})`,
+          transition: "filter 0.4s ease, opacity 0.3s ease",
+          opacity: loaded ? 1 : 0,
+          userSelect: "none",
+        }}
+      />
+    </div>
+  );
+}
+
 // ── Card component ────────────────────────────────────────────────────────
 interface CardProps {
-  img: typeof IMAGES[0];
+  img: typeof ALL_IMAGES[0];
   offset: number;
   onClick: () => void;
   onOpenLightbox: () => void;
@@ -129,17 +159,11 @@ function CoverCard({ img, offset, onClick, onOpenLightbox }: CardProps) {
           transition: "box-shadow 0.4s ease",
         }}
       >
-        <img
+        <BlurImage
           src={img.src}
           alt={img.alt}
-          draggable={false}
-          loading="lazy"
-          className="w-full h-full object-cover"
-          style={{
-            filter: `grayscale(${cfg.grayscale}) brightness(${cfg.brightness})`,
-            transition: "filter 0.4s ease",
-            userSelect: "none",
-          }}
+          grayscale={cfg.grayscale}
+          brightness={cfg.brightness}
         />
 
         {/* Center card: subtle cyan top border glow */}
@@ -193,10 +217,13 @@ export default function PortfolioGallery() {
   const { ref, isVisible } = useScrollAnimation();
   const [current, setCurrent] = useState(0);
   const [lightbox, setLightbox] = useState(false);
+  const [maxVisible, setMaxVisible] = useState(BATCH);
   const touchStartX = useRef<number | null>(null);
 
-  const prev = useCallback(() => setCurrent((i) => (i - 1 + IMAGES.length) % IMAGES.length), []);
-  const next = useCallback(() => setCurrent((i) => (i + 1) % IMAGES.length), []);
+  const IMAGES = ALL_IMAGES.slice(0, maxVisible);
+
+  const prev = useCallback(() => setCurrent((i) => (i - 1 + IMAGES.length) % IMAGES.length), [IMAGES.length]);
+  const next = useCallback(() => setCurrent((i) => (i + 1) % IMAGES.length), [IMAGES.length]);
 
   // Keyboard nav
   useEffect(() => {
@@ -356,6 +383,21 @@ export default function PortfolioGallery() {
               <ChevronRight size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
             </button>
           </div>
+        {/* Load more */}
+        {maxVisible < ALL_IMAGES.length && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={isVisible ? { opacity: 1 } : {}}
+            className="text-center mt-8"
+          >
+            <button
+              onClick={() => setMaxVisible((n) => Math.min(n + BATCH, ALL_IMAGES.length))}
+              className="px-8 py-3 rounded-xl border border-border text-sm font-semibold text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+            >
+              Показать ещё ({ALL_IMAGES.length - maxVisible} проектов)
+            </button>
+          </motion.div>
+        )}
         </motion.div>
       </div>
 

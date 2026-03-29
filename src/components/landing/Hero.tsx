@@ -114,7 +114,7 @@ export default function Hero() {
       {!reducedMotion && (
         <div
           className="absolute inset-0 overflow-hidden pointer-events-none select-none"
-          style={{ opacity: 0.25 }}
+          style={{ opacity: 0.05 }}
           aria-hidden="true"
         >
           {CODE_LINES.map((line, i) => (
@@ -212,25 +212,15 @@ export default function Hero() {
           transition={{ delay: 0.7 }}
           className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-8 text-sm text-muted-foreground"
         >
-          <span className="hover:text-primary transition-colors cursor-default"
-            style={{ animation: "none" }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1.15)"; (e.currentTarget as HTMLElement).style.transition = "transform 0.3s"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
-          >
+          <span className="hover:text-primary hover:scale-[1.15] transition-all duration-300 cursor-default">
             🏆 50+ проектов
           </span>
           <span className="hidden sm:inline">·</span>
-          <span className="hover:text-primary transition-colors cursor-default"
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1.15)"; (e.currentTarget as HTMLElement).style.transition = "transform 0.3s"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
-          >
+          <span className="hover:text-primary hover:scale-[1.15] transition-all duration-300 cursor-default">
             🌍 Работаю с РФ и СНГ
           </span>
           <span className="hidden sm:inline">·</span>
-          <span className="hover:text-primary transition-colors cursor-default"
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1.15)"; (e.currentTarget as HTMLElement).style.transition = "transform 0.3s"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
-          >
+          <span className="hover:text-primary hover:scale-[1.15] transition-all duration-300 cursor-default">
             ⚡ Ответ за 1 час
           </span>
         </motion.div>

@@ -75,7 +75,7 @@ export default function AIChatBot() {
         ...prev,
         { id: idRef.current++, text, from: "bot" },
       ]);
-    }, 1500);
+    }, 900);
   }, []);
 
   const handleQuickReply = (key: string, label: string) => {
@@ -108,7 +108,13 @@ export default function AIChatBot() {
     setIsOpen(true);
     setShowBubble(false);
     setIsHappy(true);
+    document.body.setAttribute("data-chatbot-open", "1");
     setTimeout(() => setIsHappy(false), 1000);
+  };
+
+  const closeChat = () => {
+    setIsOpen(false);
+    document.body.removeAttribute("data-chatbot-open");
   };
 
   return (
@@ -225,7 +231,7 @@ export default function AIChatBot() {
               </div>
             </div>
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={closeChat}
               className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-lg hover:bg-muted"
               aria-label="Закрыть чат"
             >

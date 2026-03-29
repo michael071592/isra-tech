@@ -15,6 +15,7 @@ import Footer from "@/components/landing/Footer";
 import FloatingElements from "@/components/landing/FloatingElements";
 import ExitPopup from "@/components/landing/ExitPopup";
 import PageLoader from "@/components/landing/PageLoader";
+import SectionDivider from "@/components/landing/SectionDivider";
 
 // Lazy-load heavy interactive components
 const AIChatBot = lazy(() => import("@/components/landing/AIChatBot"));
@@ -30,15 +31,19 @@ export default function Index() {
       </a>
       <Navbar />
       <Hero />
+      <SectionDivider variant={1} />
       <Problems />
       <Services />
+      <SectionDivider variant={2} />
       <About />
       <Portfolio />
       <PortfolioGallery />
+      <SectionDivider variant={3} />
       <Process />
       <Testimonials />
       <Pricing />
       <FAQ />
+      <SectionDivider variant={1} />
       <FinalCTA />
       <Footer />
       <FloatingElements />

@@ -24,6 +24,11 @@ export default function ActivityTicker() {
     const show = () => {
       const item = ACTIVITIES[indexRef.current % ACTIVITIES.length];
       indexRef.current++;
+      // Don't show if chatbot is open
+      if (document.body.hasAttribute("data-chatbot-open")) {
+        timerRef.current = setTimeout(show, (Math.random() * 8000) + 12000);
+        return;
+      }
       setCurrent(item);
       setVisible(true);
 

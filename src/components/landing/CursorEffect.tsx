@@ -106,7 +106,7 @@ export default function CursorEffect() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 z-[999] pointer-events-none hidden md:block"
+      className="fixed inset-0 z-[40] pointer-events-none hidden md:block"
       style={{ willChange: "transform" }}
     />
   );
