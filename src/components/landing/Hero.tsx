@@ -114,6 +114,7 @@ export default function Hero() {
       {!reducedMotion && (
         <div
           className="absolute inset-0 overflow-hidden pointer-events-none select-none"
+          style={{ opacity: 0.5 }}
           aria-hidden="true"
         >
           {CODE_LINES.map((line, i) => (
