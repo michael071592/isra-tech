@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Maximize2 } from "lucide-react";
 
 const IMAGES = Array.from({ length: 39 }, (_, i) => ({
   id: i + 1,
@@ -9,64 +9,243 @@ const IMAGES = Array.from({ length: 39 }, (_, i) => ({
   alt: `Проект ${i + 1}`,
 }));
 
-// Rotation pattern — subtle, alternating, intentional
-const ROTATIONS = [-3, 1.5, -1.5, 2.5, -2, 1, -1, 3, -2.5, 1.5, 0.5, -1.5];
-const getRotation = (i: number) => ROTATIONS[i % ROTATIONS.length];
+// ── Transform config by card offset from center ──────────────────────────
+const CARD_CONFIG: Record<number, {
+  scale: number;
+  opacity: number;
+  translateX: number;
+  rotateY: number;
+  translateZ: number;
+  grayscale: number;
+  brightness: number;
+  zIndex: number;
+}> = {
+  0: {
+    scale: 1,
+    opacity: 1,
+    translateX: 0,
+    rotateY: 0,
+    translateZ: 140,
+    grayscale: 0,
+    brightness: 1,
+    zIndex: 10,
+  },
+  1: {
+    scale: 0.78,
+    opacity: 0.75,
+    translateX: 310,
+    rotateY: -18,
+    translateZ: 0,
+    grayscale: 0.35,
+    brightness: 0.72,
+    zIndex: 6,
+  },
+  "-1": {
+    scale: 0.78,
+    opacity: 0.75,
+    translateX: -310,
+    rotateY: 18,
+    translateZ: 0,
+    grayscale: 0.35,
+    brightness: 0.72,
+    zIndex: 6,
+  },
+  2: {
+    scale: 0.56,
+    opacity: 0.4,
+    translateX: 530,
+    rotateY: -28,
+    translateZ: -60,
+    grayscale: 0.7,
+    brightness: 0.5,
+    zIndex: 2,
+  },
+  "-2": {
+    scale: 0.56,
+    opacity: 0.4,
+    translateX: -530,
+    rotateY: 28,
+    translateZ: -60,
+    grayscale: 0.7,
+    brightness: 0.5,
+    zIndex: 2,
+  },
+};
 
+function getConfig(offset: number) {
+  const clampedOffset = Math.max(-2, Math.min(2, offset));
+  return CARD_CONFIG[clampedOffset] ?? null;
+}
+
+const SPRING = { type: "spring" as const, stiffness: 260, damping: 28, mass: 1 };
+
+// ── Card component ────────────────────────────────────────────────────────
+interface CardProps {
+  img: typeof IMAGES[0];
+  offset: number;
+  onClick: () => void;
+  onOpenLightbox: () => void;
+}
+
+function CoverCard({ img, offset, onClick, onOpenLightbox }: CardProps) {
+  const cfg = getConfig(offset);
+  if (!cfg || Math.abs(offset) > 2) return null;
+
+  const isCenter = offset === 0;
+
+  return (
+    <motion.div
+      className="absolute"
+      style={{
+        width: 540,
+        height: 340,
+        top: "50%",
+        left: "50%",
+        marginLeft: -270,
+        marginTop: -170,
+        perspective: "1200px",
+        cursor: isCenter ? "default" : "pointer",
+        zIndex: cfg.zIndex,
+        willChange: "transform, opacity",
+      }}
+      animate={{
+        scale: cfg.scale,
+        opacity: cfg.opacity,
+        x: cfg.translateX,
+        rotateY: cfg.rotateY,
+        z: cfg.translateZ,
+      }}
+      transition={SPRING}
+      onClick={isCenter ? undefined : onClick}
+    >
+      {/* Card shell */}
+      <div
+        className="w-full h-full rounded-2xl overflow-hidden relative"
+        style={{
+          boxShadow: isCenter
+            ? "0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px hsla(191,100%,50%,0.18), 0 0 60px hsla(191,100%,50%,0.12)"
+            : "0 16px 40px rgba(0,0,0,0.45)",
+          transition: "box-shadow 0.4s ease",
+        }}
+      >
+        <img
+          src={img.src}
+          alt={img.alt}
+          draggable={false}
+          loading="lazy"
+          className="w-full h-full object-cover"
+          style={{
+            filter: `grayscale(${cfg.grayscale}) brightness(${cfg.brightness})`,
+            transition: "filter 0.4s ease",
+            userSelect: "none",
+          }}
+        />
+
+        {/* Center card: subtle cyan top border glow */}
+        {isCenter && (
+          <div
+            className="absolute inset-x-0 top-0 h-0.5"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, hsl(191 100% 50%), transparent)",
+            }}
+          />
+        )}
+
+        {/* Center card: zoom button */}
+        {isCenter && (
+          <button
+            onClick={onOpenLightbox}
+            className="absolute top-3 right-3 w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+            style={{
+              background: "hsla(220,26%,11%,0.7)",
+              backdropFilter: "blur(8px)",
+              border: "1px solid hsla(191,100%,50%,0.3)",
+            }}
+            aria-label="Открыть полный экран"
+          >
+            <Maximize2 size={14} className="text-primary" />
+          </button>
+        )}
+
+        {/* Side cards: dim overlay + click hint */}
+        {!isCenter && (
+          <div
+            className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300"
+            style={{ background: "rgba(0,0,0,0.25)" }}
+          >
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center"
+              style={{ background: "hsla(191,100%,50%,0.15)", backdropFilter: "blur(6px)", border: "1px solid hsla(191,100%,50%,0.4)" }}
+            >
+              {offset < 0 ? <ChevronLeft size={18} className="text-primary" /> : <ChevronRight size={18} className="text-primary" />}
+            </div>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Main component ────────────────────────────────────────────────────────
 export default function PortfolioGallery() {
   const { ref, isVisible } = useScrollAnimation();
-  const [lightbox, setLightbox] = useState<number | null>(null);
-  const stripRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const scrollLeft = useRef(0);
+  const [current, setCurrent] = useState(0);
+  const [lightbox, setLightbox] = useState(false);
+  const touchStartX = useRef<number | null>(null);
 
-  /* ── Keyboard nav ── */
-  const handleKey = useCallback(
-    (e: KeyboardEvent) => {
-      if (lightbox === null) return;
-      if (e.key === "Escape") setLightbox(null);
-      if (e.key === "ArrowRight") setLightbox((i) => (i! + 1) % IMAGES.length);
-      if (e.key === "ArrowLeft") setLightbox((i) => (i! - 1 + IMAGES.length) % IMAGES.length);
-    },
-    [lightbox]
-  );
-  useEffect(() => {
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [handleKey]);
+  const prev = useCallback(() => setCurrent((i) => (i - 1 + IMAGES.length) % IMAGES.length), []);
+  const next = useCallback(() => setCurrent((i) => (i + 1) % IMAGES.length), []);
 
+  // Keyboard nav
   useEffect(() => {
-    document.body.style.overflow = lightbox !== null ? "hidden" : "";
+    const onKey = (e: KeyboardEvent) => {
+      if (lightbox) {
+        if (e.key === "Escape") setLightbox(false);
+        if (e.key === "ArrowLeft") prev();
+        if (e.key === "ArrowRight") next();
+        return;
+      }
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") next();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox, prev, next]);
+
+  // Lock scroll in lightbox
+  useEffect(() => {
+    document.body.style.overflow = lightbox ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [lightbox]);
 
-  /* ── Drag-to-scroll (desktop) ── */
-  const onMouseDown = (e: React.MouseEvent) => {
-    isDragging.current = true;
-    startX.current = e.pageX - (stripRef.current?.offsetLeft ?? 0);
-    scrollLeft.current = stripRef.current?.scrollLeft ?? 0;
-    if (stripRef.current) stripRef.current.style.cursor = "grabbing";
+  // Touch swipe
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
   };
-  const onMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging.current || !stripRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - (stripRef.current.offsetLeft ?? 0);
-    const walk = (x - startX.current) * 1.4;
-    stripRef.current.scrollLeft = scrollLeft.current - walk;
-  };
-  const onMouseUp = () => {
-    isDragging.current = false;
-    if (stripRef.current) stripRef.current.style.cursor = "grab";
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const delta = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(delta) > 40) delta > 0 ? next() : prev();
+    touchStartX.current = null;
   };
 
+  // Progress dots — show max 7 visible, sliding window
+  const DOT_MAX = 7;
+  const halfDots = Math.floor(DOT_MAX / 2);
+  const dotStart = Math.max(0, Math.min(current - halfDots, IMAGES.length - DOT_MAX));
+  const dots = Array.from({ length: Math.min(DOT_MAX, IMAGES.length) }, (_, i) => dotStart + i);
+
   return (
-    <section className="py-16 md:py-24 overflow-hidden" ref={ref}>
-      <div className="container mx-auto px-4 mb-10">
+    <section className="py-16 md:py-24" ref={ref}>
+      <div className="container mx-auto px-4">
+
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          className="text-center"
+          transition={{ duration: 0.5 }}
+          className="text-center mb-14"
         >
           <span
             className="inline-block text-xs font-semibold tracking-widest uppercase mb-3"
@@ -74,155 +253,162 @@ export default function PortfolioGallery() {
           >
             Галерея работ
           </span>
-          <h2 className="font-display text-3xl md:text-4xl font-bold hover-gradient-text">
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-3 hover-gradient-text">
             Проекты, которые я создал
           </h2>
-          <p className="text-muted-foreground text-sm mt-3">
-            Перетащите для прокрутки · нажмите для просмотра
+          <p className="text-muted-foreground text-sm">
+            {String(current + 1).padStart(2, "0")} / {String(IMAGES.length).padStart(2, "0")}
           </p>
+        </motion.div>
+
+        {/* ── Coverflow stage ── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={isVisible ? { opacity: 1 } : {}}
+          transition={{ delay: 0.15 }}
+        >
+          <div
+            className="relative mx-auto overflow-visible"
+            style={{
+              height: 380,
+              maxWidth: 1100,
+              perspective: "1200px",
+              perspectiveOrigin: "center center",
+            }}
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+          >
+            {/* Ambient glow behind center */}
+            <div
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none"
+              style={{
+                width: 500,
+                height: 260,
+                background: "radial-gradient(ellipse, hsla(191,100%,50%,0.12) 0%, transparent 70%)",
+                filter: "blur(40px)",
+                zIndex: 0,
+              }}
+            />
+
+            {/* Cards: render -2 to +2 from current */}
+            {[-2, -1, 0, 1, 2].map((offset) => {
+              const idx = (current + offset + IMAGES.length) % IMAGES.length;
+              return (
+                <CoverCard
+                  key={`${current}-${offset}`}
+                  img={IMAGES[idx]}
+                  offset={offset}
+                  onClick={() => offset < 0 ? prev() : next()}
+                  onOpenLightbox={() => setLightbox(true)}
+                />
+              );
+            })}
+          </div>
+
+          {/* ── Navigation buttons ── */}
+          <div className="flex items-center justify-center gap-6 mt-10">
+            <button
+              onClick={prev}
+              className="group w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+              style={{
+                background: "hsla(220,26%,11%,0.8)",
+                backdropFilter: "blur(12px)",
+                border: "1px solid hsla(215,14%,21%,0.8)",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+              }}
+              aria-label="Предыдущий"
+            >
+              <ChevronLeft size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
+            </button>
+
+            {/* Dot indicators */}
+            <div className="flex items-center gap-2">
+              {dots.map((dotIdx) => (
+                <button
+                  key={dotIdx}
+                  onClick={() => setCurrent(dotIdx)}
+                  className="transition-all duration-300"
+                  style={{
+                    width: dotIdx === current ? 24 : 6,
+                    height: 6,
+                    borderRadius: 999,
+                    background: dotIdx === current
+                      ? "hsl(191 100% 50%)"
+                      : "hsla(215,14%,50%,0.4)",
+                  }}
+                  aria-label={`Перейти к проекту ${dotIdx + 1}`}
+                />
+              ))}
+            </div>
+
+            <button
+              onClick={next}
+              className="group w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+              style={{
+                background: "hsla(220,26%,11%,0.8)",
+                backdropFilter: "blur(12px)",
+                border: "1px solid hsla(215,14%,21%,0.8)",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+              }}
+              aria-label="Следующий"
+            >
+              <ChevronRight size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
+            </button>
+          </div>
         </motion.div>
       </div>
 
-      {/* ── Horizontal curated strip ── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={isVisible ? { opacity: 1 } : {}}
-        transition={{ delay: 0.2 }}
-      >
-        <div
-          ref={stripRef}
-          className="flex gap-5 px-8 md:px-16 overflow-x-auto pb-10 pt-10 select-none"
-          style={{
-            cursor: "grab",
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-            WebkitOverflowScrolling: "touch",
-          }}
-          onMouseDown={onMouseDown}
-          onMouseMove={onMouseMove}
-          onMouseUp={onMouseUp}
-          onMouseLeave={onMouseUp}
-        >
-          {/* Hide native scrollbar via inline style (webkit) */}
-          <style>{`div::-webkit-scrollbar { display: none; }`}</style>
-
-          {IMAGES.map((img, idx) => {
-            const rot = getRotation(idx);
-            return (
-              <motion.div
-                key={img.id}
-                initial={{ opacity: 0, y: 40, rotate: rot }}
-                animate={
-                  isVisible
-                    ? { opacity: 1, y: 0, rotate: rot }
-                    : { opacity: 0, y: 40, rotate: rot }
-                }
-                transition={{ duration: 0.6, delay: Math.min(idx, 6) * 0.07 }}
-                whileHover={{
-                  y: -12,
-                  rotate: rot * 0.2,   // rotation almost straightens on hover
-                  scale: 1.04,
-                  zIndex: 10,
-                  transition: { duration: 0.3, ease: "easeOut" },
-                }}
-                className="relative flex-shrink-0 overflow-hidden rounded-2xl"
-                style={{
-                  width: "220px",
-                  height: "300px",
-                  boxShadow: "0 12px 40px rgba(0,0,0,0.45)",
-                  cursor: "pointer",
-                  transformOrigin: "bottom center",
-                }}
-                onClick={() => {
-                  if (!isDragging.current) setLightbox(idx);
-                }}
-                onMouseDown={(e) => {
-                  // capture drag start for distinguishing drag vs click
-                  startX.current = e.pageX;
-                }}
-                onMouseUp={(e) => {
-                  // if moved > 5px it's a drag, not a click
-                  if (Math.abs(e.pageX - startX.current) > 5) {
-                    isDragging.current = true;
-                  }
-                }}
-              >
-                <img
-                  src={img.src}
-                  alt={img.alt}
-                  loading="lazy"
-                  draggable={false}
-                  className="w-full h-full object-cover pointer-events-none"
-                />
-                {/* Premium shimmer overlay on hover */}
-                <div
-                  className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-400"
-                  style={{
-                    background:
-                      "linear-gradient(160deg, rgba(0,224,255,0.08) 0%, transparent 60%)",
-                  }}
-                />
-              </motion.div>
-            );
-          })}
-
-          {/* Right padding spacer */}
-          <div className="flex-shrink-0 w-8" />
-        </div>
-      </motion.div>
-
       {/* ── Lightbox ── */}
       <AnimatePresence>
-        {lightbox !== null && (
+        {lightbox && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="fixed inset-0 z-[100] flex items-center justify-center"
-            style={{ background: "rgba(0,0,0,0.93)", backdropFilter: "blur(16px)" }}
-            onClick={() => setLightbox(null)}
+            style={{ background: "rgba(0,0,0,0.94)", backdropFilter: "blur(16px)" }}
+            onClick={() => setLightbox(false)}
           >
-            {/* Close */}
             <button
-              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
-              onClick={() => setLightbox(null)}
+              className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+              style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)" }}
+              onClick={() => setLightbox(false)}
               aria-label="Закрыть"
             >
               <X size={18} className="text-white" />
             </button>
 
-            {/* Counter */}
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 text-sm text-white/50 tabular-nums">
-              {lightbox + 1} / {IMAGES.length}
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 text-sm text-white/40 tabular-nums">
+              {String(current + 1).padStart(2, "0")} / {String(IMAGES.length).padStart(2, "0")}
             </div>
 
-            {/* Prev */}
             <button
-              className="absolute left-3 md:left-6 z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
-              onClick={(e) => { e.stopPropagation(); setLightbox((i) => (i! - 1 + IMAGES.length) % IMAGES.length); }}
+              className="absolute left-4 w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+              style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)" }}
+              onClick={(e) => { e.stopPropagation(); prev(); }}
               aria-label="Назад"
             >
               <ChevronLeft size={20} className="text-white" />
             </button>
 
             <motion.img
-              key={lightbox}
-              initial={{ opacity: 0, scale: 0.95 }}
+              key={current}
+              initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              exit={{ opacity: 0, scale: 0.96 }}
               transition={{ duration: 0.22 }}
-              src={IMAGES[lightbox].src}
-              alt={IMAGES[lightbox].alt}
+              src={IMAGES[current].src}
+              alt={IMAGES[current].alt}
               className="max-w-[88vw] max-h-[84vh] object-contain rounded-2xl"
-              style={{ boxShadow: "0 30px 80px rgba(0,0,0,0.7)" }}
+              style={{ boxShadow: "0 40px 100px rgba(0,0,0,0.7)" }}
               onClick={(e) => e.stopPropagation()}
             />
 
-            {/* Next */}
             <button
-              className="absolute right-3 md:right-6 z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
-              onClick={(e) => { e.stopPropagation(); setLightbox((i) => (i! + 1) % IMAGES.length); }}
+              className="absolute right-4 w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+              style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)" }}
+              onClick={(e) => { e.stopPropagation(); next(); }}
               aria-label="Вперёд"
             >
               <ChevronRight size={20} className="text-white" />
